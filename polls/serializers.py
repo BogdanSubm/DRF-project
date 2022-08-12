@@ -3,6 +3,7 @@ from rest_framework import serializers
 from .models import Client, Mailing, Message
 
 
+
 class UserSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = User
@@ -16,6 +17,10 @@ class GroupSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class ClientSerializer(serializers.Serializer):
+    phone = serializers.CharField()
+    phone_code = serializers.CharField()
+    tag = serializers.CharField()
+    timezone = serializers.CharField()
     class Meta:
         model = Client
         fields = '__all__'
@@ -31,6 +36,10 @@ class ClientSerializer(serializers.Serializer):
 
 
 class MailingSerializer(serializers.Serializer):
+    mailing_start = serializers.DateTimeField()
+    msg_text = serializers.CharField()
+    property_filter = serializers.CharField()
+    mailing_end = serializers.DateTimeField()
     class Meta:
         model = Client
         fields = '__all__'

@@ -1,16 +1,18 @@
+import pytz
+from django.core.validators import RegexValidator
+
 from django.db import models
 
 
 class Client(models.Model):
-    id = models.PositiveIntegerField(primary_key=True)
-    phone = models.IntegerField(max_length=12, null=True)
-    phone_code = models.IntegerField(max_length=4, null=True)
-    tag = models.TextField(max_length=10, null=True)
-    timezone = models.DateTimeField(auto_now_add=True)
-
+    TIMEZONES = tuple(zip(pytz.all_timezones, pytz.all_timezones))
+    phone_regex = RegexValidator(regex=r'^\+7?1?\d{10}$', message="Phone number must be entered in the format: '+7XXXXXXXXXX'. Up to 10 digits allowed.")
+    phone = models.CharField(validators=[phone_regex], max_length=12, blank=True)
+    phone_code = models.CharField(max_length=4, null=True)
+    tag = models.CharField(max_length=10, null=True)
+    timezone = models.CharField(max_length=32, choices=TIMEZONES, default='UTC')
 
 class Mailing(models.Model):
-    id = models.PositiveIntegerField(primary_key=True)
     mailing_start = models.DateTimeField()
     msg_text = models.TextField(max_length=500)
     property_filter = models.TextField(max_length=14)

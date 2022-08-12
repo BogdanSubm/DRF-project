@@ -42,7 +42,15 @@ class ClientApiViewCreate(APIView):
         return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
 
 
+
+
 class ClientApiViewUpdate(APIView):
+    def get(self, request, client_id):
+        client = get_object_or_404(Client, pk=client_id)
+        serializer = ClientSerializer(client)
+        print(serializer.data)
+        return Response({'posts': serializer.data})
+
     def patch(self, request, client_id):
         client = get_object_or_404(Client, pk=client_id)
         serializer = ClientSerializer(client, data=request.data, partial=True)
@@ -50,6 +58,7 @@ class ClientApiViewUpdate(APIView):
             client = serializer.save()
             return Response(ClientSerializer(client).data)
         return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
+
     def delete(self, request, client_id):
         client = get_object_or_404(Client, pk=client_id)
         client.delete()
