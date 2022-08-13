@@ -7,16 +7,16 @@ from django.shortcuts import get_object_or_404
 from rest_framework import viewsets
 from rest_framework import permissions
 from .serializers import UserSerializer, GroupSerializer
-from ..secret import secret
+from mailing.polls.secret import secret
 
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.status import \
-    HTTP_400_BAD_REQUEST, HTTP_404_NOT_FOUND, HTTP_200_OK, HTTP_201_CREATED, HTTP_204_NO_CONTENT
+    HTTP_400_BAD_REQUEST, HTTP_201_CREATED, HTTP_204_NO_CONTENT
 
 
-from .models import Client, Mailing, Message
+from .models import Client, Mailing
 from .serializers import ClientSerializer, MailingSerializer
 
 
