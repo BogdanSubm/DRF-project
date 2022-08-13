@@ -7,9 +7,9 @@ from django.shortcuts import get_object_or_404
 from rest_framework import viewsets
 from rest_framework import permissions
 from .serializers import UserSerializer, GroupSerializer
-from mailing.polls.secret import secret
+# from mailing.polls.secret import secret
 
-
+secret = "asd"
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.status import \

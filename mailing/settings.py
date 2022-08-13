@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     # Custom apps
     'polls.apps.PollsConfig',
+    'django_celery_results',
 ]
 
 MIDDLEWARE = [
@@ -132,3 +133,16 @@ REST_FRAMEWORK = {
 
 # Celery Configuration Options
 CELERY_TIMEZONE = 'UTC'
+
+CELERY_BROKER_URL = 'redis://127.0.0.1:16379/0'
+
+CELERY_RESULT_BACKEND = 'django-db'
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+        'LOCATION': 'redis://127.0.0.1:16379/1',
+    }
+}
+
+CELERY_CACHE_BACKEND = 'default'
