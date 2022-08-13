@@ -6,10 +6,12 @@ from django.contrib.auth.models import User, Group
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets
 from rest_framework import permissions
-from .serializers import UserSerializer, GroupSerializer
+from .serializers import UserSerializer, GroupSerializer, ClientSerializer, MailingSerializer, MessageSerializer
+from .tasks import send_verification_msg
+
 # from mailing.polls.secret import secret
 
-secret = "asd"
+
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.status import \
@@ -17,7 +19,6 @@ from rest_framework.status import \
 
 
 from .models import Client, Mailing
-from .serializers import ClientSerializer, MailingSerializer
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -69,6 +70,9 @@ class ClientApiViewUpdate(APIView):
         return Response("Клиент удалён", status=HTTP_204_NO_CONTENT)
 
 
+secret = "asd"
+
+
 class MailingApiViewCreate(APIView):
     def post(self, request):
         serializer = MailingSerializer(data=request.data, context={'request': request})
@@ -89,14 +93,12 @@ class MailingApiViewCreate(APIView):
                     # "accept": "application/json",
                     # "Content-Type": "application/json"
                 }
-                print(mailing.get("msg_text"))
                 body = {
                     "id": 2,
                     "phone": 79225161025,
                     "text": mailing.get("msg_text")
                 }
                 response = requests.post("https://probe.fbrq.cloud/v1/send/2", headers=headers, data=json.dumps(body))
-                print(response.status_code)
             return Response(mailing, status=HTTP_201_CREATED)
         return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
 
@@ -119,4 +121,18 @@ class MailingApiViewUpdate(APIView):
         client = get_object_or_404(Client, pk=mailing_id)
         client.delete()
         return Response("Рассылка удалена", status=HTTP_204_NO_CONTENT)
+
+
+class MessageApiView(APIView):
+    def post(self, request):
+        serializer = MessageSerializer(data=request.data)
+        if serializer.is_valid():
+            message = serializer.save()
+            msg = MessageSerializer(message).data
+            mailing_id = msg.get('id_mailing')
+            send_verification_msg(mailing_id, msg.get('id'))
+            return Response(MessageSerializer(message).data, status=HTTP_201_CREATED)
+        return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
+
+
 

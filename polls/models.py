@@ -21,7 +21,6 @@ class Mailing(models.Model):
 
 
 class Message(models.Model):
-    id = models.PositiveIntegerField(primary_key=True)
     PRIORITIES = (
         (0, 'Отправляется'),
         (1, 'Сообщение доставлено'),
