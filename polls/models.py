@@ -12,6 +12,7 @@ class Client(models.Model):
     tag = models.CharField(max_length=10, null=True)
     timezone = models.CharField(max_length=32, choices=TIMEZONES, default='UTC')
 
+
 class Mailing(models.Model):
     mailing_start = models.DateTimeField()
     msg_text = models.TextField(max_length=500)

@@ -1,3 +1,7 @@
+from datetime import datetime
+import json
+
+import requests
 from django.contrib.auth.models import User, Group
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets
@@ -48,7 +52,6 @@ class ClientApiViewUpdate(APIView):
     def get(self, request, client_id):
         client = get_object_or_404(Client, pk=client_id)
         serializer = ClientSerializer(client)
-        print(serializer.data)
         return Response({'posts': serializer.data})
 
     def patch(self, request, client_id):
@@ -70,11 +73,40 @@ class MailingApiViewCreate(APIView):
         serializer = MailingSerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
             mailing = serializer.save()
-            return Response(ClientSerializer(mailing).data, status=HTTP_201_CREATED)
+            mailing = MailingSerializer(mailing).data
+            mailing_start = mailing.get('mailing_start')
+            mailing_end = mailing.get('mailing_end')
+            if not (mailing_start and mailing_end):
+                return Response(status=HTTP_400_BAD_REQUEST)
+            clients_phones = Client.objects.filter(tag=mailing.get("property_filter")).first().phone
+            mailing_start = datetime.strptime(mailing_start, '%Y-%m-%dT%H:%M:%SZ')
+            mailing_end = datetime.strptime(mailing_end, '%Y-%m-%dT%H:%M:%SZ')
+            datetime_now = datetime.now()
+            if datetime_now > mailing_start and datetime_now < mailing_end:
+                headers = {
+                    "Authorization": "bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2OTE2NjAyNTAsImlzcyI6ImZh"
+                                     "YnJpcXVlIiwibmFtZSI6ImJvZ2Rhbl9rYyJ9.Kto44M36XLGa3bo22Aw23mQnEhIIEUqRmQqAjk8DJIQ"
+                    # "accept": "application/json",
+                    # "Content-Type": "application/json"
+                }
+                print(mailing.get("msg_text"))
+                body = {
+                    "id": 2,
+                    "phone": 79225161025,
+                    "text": mailing.get("msg_text")
+                }
+                response = requests.post("https://probe.fbrq.cloud/v1/send/2", headers=headers, data=json.dumps(body))
+                print(response.status_code)
+            return Response(mailing, status=HTTP_201_CREATED)
         return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
 
 
 class MailingApiViewUpdate(APIView):
+    def get(self, request, mailing_id):
+        mailing = get_object_or_404(Mailing, pk=mailing_id)
+        serializer = MailingSerializer(mailing)
+        return Response({'posts': serializer.data})
+
     def patch(self, request, mailing_id):
         mailing = get_object_or_404(Mailing, pk=mailing_id)
         serializer = ClientSerializer(mailing, data=request.data, partial=True)
