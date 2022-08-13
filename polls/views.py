@@ -7,6 +7,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework import viewsets
 from rest_framework import permissions
 from .serializers import UserSerializer, GroupSerializer
+from ..secret import secret
 
 
 from rest_framework.views import APIView
@@ -84,8 +85,7 @@ class MailingApiViewCreate(APIView):
             datetime_now = datetime.now()
             if datetime_now > mailing_start and datetime_now < mailing_end:
                 headers = {
-                    "Authorization": "bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2OTE2NjAyNTAsImlzcyI6ImZh"
-                                     "YnJpcXVlIiwibmFtZSI6ImJvZ2Rhbl9rYyJ9.Kto44M36XLGa3bo22Aw23mQnEhIIEUqRmQqAjk8DJIQ"
+                    "Authorization": secret
                     # "accept": "application/json",
                     # "Content-Type": "application/json"
                 }
