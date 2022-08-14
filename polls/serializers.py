@@ -55,21 +55,21 @@ class MailingSerializer(serializers.Serializer):
         return instance
 
 
-class MessageSerializer(serializers.Serializer):
-    msg_start = serializers.DateTimeField()
-    msg_status = serializers.IntegerField()
-    id_mailing = serializers.CharField()
-    id_client = serializers.CharField()
-
-    class Meta:
-        model = Message
-        fields = '__all__'
-
-    def create(self, validated_data):
-        return Message.objects.create(**validated_data)
-
-    def update(self, instance, validated_data):
-        for key, value in validated_data.items():
-            setattr(instance, key, value)
-        instance.save()
-        return instance
+# class MessageSerializer(serializers.Serializer):
+#     msg_start = serializers.DateTimeField()
+#     msg_status = serializers.IntegerField()
+#     id_mailing = serializers.CharField()
+#     id_client = serializers.CharField()
+#
+#     class Meta:
+#         model = Message
+#         fields = '__all__'
+#
+#     def create(self, validated_data):
+#         return Message.objects.create(**validated_data)
+#
+#     def update(self, instance, validated_data):
+#         for key, value in validated_data.items():
+#             setattr(instance, key, value)
+#         instance.save()
+#         return instance

@@ -17,5 +17,5 @@ urlpatterns = [
     path('client/<int:client_id>/', views.ClientApiViewUpdate.as_view(), name='client_update'),
     path('mailing/', views.MailingApiViewCreate.as_view(), name='mailing_create'),
     path('mailing/<int:mailing_id>/', views.MailingApiViewUpdate.as_view(), name='mailing_update'),
-    path('message/', views.MessageApiView.as_view(), name='message'),
+    # path('message/', views.MessageApiView.as_view(), name='message'),
 ]

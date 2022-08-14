@@ -6,7 +6,7 @@ from django.contrib.auth.models import User, Group
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets
 from rest_framework import permissions
-from .serializers import UserSerializer, GroupSerializer, ClientSerializer, MailingSerializer, MessageSerializer
+from .serializers import UserSerializer, GroupSerializer, ClientSerializer, MailingSerializer
 from .tasks import send_verification_msg
 
 # from mailing.polls.secret import secret
@@ -81,24 +81,28 @@ class MailingApiViewCreate(APIView):
             mailing = MailingSerializer(mailing).data
             mailing_start = mailing.get('mailing_start')
             mailing_end = mailing.get('mailing_end')
+            tag = mailing.get("property_filter")
+            print(tag)
             if not (mailing_start and mailing_end):
                 return Response(status=HTTP_400_BAD_REQUEST)
-            clients_phones = Client.objects.filter(tag=mailing.get("property_filter")).first().phone
-            mailing_start = datetime.strptime(mailing_start, '%Y-%m-%dT%H:%M:%SZ')
-            mailing_end = datetime.strptime(mailing_end, '%Y-%m-%dT%H:%M:%SZ')
-            datetime_now = datetime.now()
-            if datetime_now > mailing_start and datetime_now < mailing_end:
-                headers = {
-                    "Authorization": secret
-                    # "accept": "application/json",
-                    # "Content-Type": "application/json"
-                }
-                body = {
-                    "id": 2,
-                    "phone": 79225161025,
-                    "text": mailing.get("msg_text")
-                }
-                response = requests.post("https://probe.fbrq.cloud/v1/send/2", headers=headers, data=json.dumps(body))
+            # clients_phones = Client.objects.filter(tag=mailing.get("property_filter")).first().phone
+            # mailing_start = datetime.strptime(mailing_start, '%Y-%m-%dT%H:%M:%SZ')
+            # mailing_end = datetime.strptime(mailing_end, '%Y-%m-%dT%H:%M:%SZ')
+            # datetime_now = datetime.now()
+            # if datetime_now > mailing_start and datetime_now < mailing_end:
+            #     headers = {
+            #         "Authorization": secret
+            #         # "accept": "application/json",
+            #         # "Content-Type": "application/json"
+            #     }
+            #     body = {
+            #         "id": 2,
+            #         "phone": 79225161025,
+            #         "text": mailing.get("msg_text")
+            #     }
+            #     response = requests.post("https://probe.fbrq.cloud/v1/send/2", headers=headers, data=json.dumps(body))
+            print('done')
+            send_verification_msg(tag)
             return Response(mailing, status=HTTP_201_CREATED)
         return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
 
@@ -123,16 +127,16 @@ class MailingApiViewUpdate(APIView):
         return Response("Рассылка удалена", status=HTTP_204_NO_CONTENT)
 
 
-class MessageApiView(APIView):
-    def post(self, request):
-        serializer = MessageSerializer(data=request.data)
-        if serializer.is_valid():
-            message = serializer.save()
-            msg = MessageSerializer(message).data
-            mailing_id = msg.get('id_mailing')
-            send_verification_msg(mailing_id, msg.get('id'))
-            return Response(MessageSerializer(message).data, status=HTTP_201_CREATED)
-        return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
+# class MessageApiView(APIView):
+#     def post(self, request):
+#         serializer = MessageSerializer(data=request.data)
+#         if serializer.is_valid():
+#             message = serializer.save()
+#             msg = MessageSerializer(message).data
+#             mailing_id = msg.get('id_mailing')
+#             send_verification_msg(mailing_id, msg.get('id'))
+#             return Response(MessageSerializer(message).data, status=HTTP_201_CREATED)
+#         return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
 
 
 
