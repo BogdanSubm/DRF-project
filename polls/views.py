@@ -74,6 +74,11 @@ secret = "asd"
 
 
 class MailingApiViewCreate(APIView):
+    send_verification_msg.delay()
+    def starting_messenger(self, form):
+        form.save()
+        send_verification_msg.delay(form.instance.id)
+        return super().form_valid(form)
     def post(self, request):
         serializer = MailingSerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
@@ -102,7 +107,6 @@ class MailingApiViewCreate(APIView):
             #     }
             #     response = requests.post("https://probe.fbrq.cloud/v1/send/2", headers=headers, data=json.dumps(body))
             print('done')
-            send_verification_msg(tag)
             return Response(mailing, status=HTTP_201_CREATED)
         return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
 
