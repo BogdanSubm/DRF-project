@@ -48,9 +48,8 @@ class ClientApiViewCreate(APIView):
         return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
 
 
-
-
 class ClientApiViewUpdate(APIView):
+
     def get(self, request, client_id):
         client = get_object_or_404(Client, pk=client_id)
         serializer = ClientSerializer(client)
@@ -59,10 +58,9 @@ class ClientApiViewUpdate(APIView):
     def patch(self, request, client_id):
         client = get_object_or_404(Client, pk=client_id)
         serializer = ClientSerializer(client, data=request.data, partial=True)
-        if serializer.is_valid():
-            client = serializer.save()
-            return Response(ClientSerializer(client).data)
-        return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
 
     def delete(self, request, client_id):
         client = get_object_or_404(Client, pk=client_id)
@@ -74,22 +72,21 @@ secret = "asd"
 
 
 class MailingApiViewCreate(APIView):
-    send_verification_msg.delay()
-    def starting_messenger(self, form):
-        form.save()
-        send_verification_msg.delay(form.instance.id)
-        return super().form_valid(form)
+    # send_verification_msg.delay()
+    # def starting_messenger(self, form):
+    #     form.save()
+    #     send_verification_msg.delay(form.instance.id)
+    #     return super().form_valid(form)
+
     def post(self, request):
         serializer = MailingSerializer(data=request.data, context={'request': request})
         if serializer.is_valid():
             mailing = serializer.save()
-            mailing = MailingSerializer(mailing).data
-            mailing_start = mailing.get('mailing_start')
-            mailing_end = mailing.get('mailing_end')
-            tag = mailing.get("property_filter")
-            print(tag)
+            mailing_start = mailing.mailing_start
+            mailing_end = mailing.mailing_end
             if not (mailing_start and mailing_end):
                 return Response(status=HTTP_400_BAD_REQUEST)
+            send_verification_msg(mailing.id)
             # clients_phones = Client.objects.filter(tag=mailing.get("property_filter")).first().phone
             # mailing_start = datetime.strptime(mailing_start, '%Y-%m-%dT%H:%M:%SZ')
             # mailing_end = datetime.strptime(mailing_end, '%Y-%m-%dT%H:%M:%SZ')
@@ -106,8 +103,7 @@ class MailingApiViewCreate(APIView):
             #         "text": mailing.get("msg_text")
             #     }
             #     response = requests.post("https://probe.fbrq.cloud/v1/send/2", headers=headers, data=json.dumps(body))
-            print('done')
-            return Response(mailing, status=HTTP_201_CREATED)
+            return Response(serializer.data, status=HTTP_201_CREATED)
         return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
 
 

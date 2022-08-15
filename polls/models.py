@@ -15,8 +15,8 @@ class Client(models.Model):
 
 class Mailing(models.Model):
     mailing_start = models.DateTimeField()
-    msg_text = models.TextField(max_length=500)
-    property_filter = models.TextField(max_length=14)
+    msg_text = models.TextField()
+    tag = models.CharField(max_length=14)
     mailing_end = models.DateTimeField()
 
 

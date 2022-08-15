@@ -38,7 +38,7 @@ class ClientSerializer(serializers.Serializer):
 class MailingSerializer(serializers.Serializer):
     mailing_start = serializers.DateTimeField()
     msg_text = serializers.CharField()
-    property_filter = serializers.CharField()
+    tag = serializers.CharField()
     mailing_end = serializers.DateTimeField()
 
     class Meta:
