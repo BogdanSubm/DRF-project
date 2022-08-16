@@ -114,12 +114,12 @@ class MailingApiViewUpdate(APIView):
         return Response({'posts': serializer.data})
 
     def patch(self, request, mailing_id):
-        mailing = get_object_or_404(Mailing, pk=mailing_id)
-        serializer = ClientSerializer(mailing, data=request.data, partial=True)
-        if serializer.is_valid():
-            mailing = serializer.save()
-            return Response(ClientSerializer(mailing).data)
-        return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
+        client = get_object_or_404(Client, pk=mailing_id)
+        serializer = MailingSerializer(client, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
+
 
     def delete(self, request, mailing_id):
         client = get_object_or_404(Client, pk=mailing_id)
